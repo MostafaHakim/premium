@@ -1,7 +1,7 @@
 require("dotenv").config();
-const exporess = require("express");
-const { connectDB } = require("./config/db");
-const app = exporess();
+const express = require("express");
+const connectDB = require("./config/db");
+const app = express();
 const PORT = process.env.PORT || 3000;
 const cors = require("cors");
 
@@ -10,8 +10,8 @@ app.use(cors());
 connectDB();
 
 // Middleware
-app.use(exporess.json());
-app.use(exporess.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
