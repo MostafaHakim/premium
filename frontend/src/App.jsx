@@ -40,7 +40,7 @@ export default function App() {
           path="/draw"
           element={
             <Layout>
-              <Results />
+              <ComingSoon />
             </Layout>
           }
         />
