@@ -313,7 +313,7 @@ const Results = () => {
 
                           <td className="px-6 py-4 text-sm">
                             <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full">
-                              "একটি প্রিমিয়াম মশারী জিতেছেন"
+                              একটি প্রিমিয়াম মশারী জিতেছেন
                             </span>
                           </td>
                         </tr>
@@ -346,28 +346,30 @@ const Results = () => {
                           #{index + 1}
                         </div>
                         <div>
-                          <p className="font-bold text-gray-900">
-                            {item.winner}
-                          </p>
                           <p className="text-xs text-gray-500">
-                            {formatDate(item.date)}
+                            {formatDate(item.drawDate)}
                           </p>
                         </div>
                       </div>
                       <div className="grid grid-cols-2 gap-2 text-sm">
-                        <div>
-                          <p className="text-gray-500">টিকেট</p>
+                        <div ফclassName="col-span-2 flex flex-col space-y-2">
+                          <p className="text-gray-500">টিকেট নাম্বার সমুহ</p>
                           <p className="font-mono font-semibold text-blue-600">
-                            {item.ticket}
+                            <span className="inline-flex flex-wrap gap-1 mt-1">
+                              {item.winningNumbers?.map((num, index) => (
+                                <span
+                                  key={index}
+                                  className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full mx-1 text-xs font-semibold"
+                                >
+                                  {num}
+                                </span>
+                              ))}
+                            </span>
                           </p>
-                        </div>
-                        <div>
-                          <p className="text-gray-500">মোবাইল</p>
-                          <p className="text-gray-800">{item.mobile}</p>
                         </div>
                         <div className="col-span-2 mt-2">
                           <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs">
-                            {item.prize}
+                            একটি প্রিমিয়াম মশারী জিতেছেন
                           </span>
                         </div>
                       </div>

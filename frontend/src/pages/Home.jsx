@@ -184,13 +184,16 @@ export default function Home() {
             <div className="flex justify-between items-start mb-4">
               <div>
                 <h1 className="text-2xl font-bold text-gray-800 mb-2">
-                  প্রিমিয়াম মশারি
+                  প্রিমিয়াম মশারি{" "}
+                  <div className="text-center lg:hidden bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs lg:text-sm font-semibold">
+                    ⭐ ৪.৮ (৫০০+ রিভিউ)
+                  </div>
                 </h1>
                 <p className="text-gray-600">
                   🦟 ডেঙ্গু প্রতিরোধ | ৩ লেয়ার প্রটেকশন | এয়ার ফ্লো ডিজাইন
                 </p>
               </div>
-              <div className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-semibold">
+              <div className="hidden lg:block bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs lg:text-sm font-semibold">
                 ⭐ ৪.৮ (৫০০+ রিভিউ)
               </div>
             </div>

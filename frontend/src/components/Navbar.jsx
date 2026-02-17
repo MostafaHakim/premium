@@ -45,26 +45,6 @@ const Navbar = () => {
 
           {/* Mobile Menu Button */}
           <div className="md:hidden flex items-center space-x-3">
-            {/* Mobile Cart */}
-            <Link to="/cart" className="text-white relative">
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-                />
-              </svg>
-              <span className="absolute -top-2 -right-2 bg-yellow-400 text-blue-600 text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                3
-              </span>
-            </Link>
-
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="text-white hover:text-yellow-300 focus:outline-none"
@@ -114,33 +94,13 @@ const Navbar = () => {
             >
               🏠 হোম
             </Link>
-            <Link
-              to="/products"
-              className="block py-3 text-gray-700 hover:text-blue-600 font-medium border-b border-gray-100"
-              onClick={() => setIsOpen(false)}
-            >
-              🛍️ প্রোডাক্ট
-            </Link>
+
             <Link
               to="/draw"
               className="block py-3 text-gray-700 hover:text-blue-600 font-medium border-b border-gray-100"
               onClick={() => setIsOpen(false)}
             >
-              🎲 ড্র
-            </Link>
-            <Link
-              to="/winners"
-              className="block py-3 text-gray-700 hover:text-blue-600 font-medium border-b border-gray-100"
-              onClick={() => setIsOpen(false)}
-            >
-              🏆 বিজয়ী
-            </Link>
-            <Link
-              to="/contact"
-              className="block py-3 text-gray-700 hover:text-blue-600 font-medium border-b border-gray-100"
-              onClick={() => setIsOpen(false)}
-            >
-              📞 যোগাযোগ
+              🎲 ড্র দেখুন
             </Link>
           </div>
         </div>
