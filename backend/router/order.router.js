@@ -7,6 +7,7 @@ router.post("/", orderController.createOrder);
 
 // Get all orders
 router.get("/", orderController.getAllOrders);
+router.get("/check", orderController.checkOrder);
 
 // Get a single order by ID
 router.get("/:id", orderController.getOrderById);

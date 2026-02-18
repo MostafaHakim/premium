@@ -1,136 +1,421 @@
+// const Draw = require("../model/draw.model");
+// const Order = require("../model/order.model");
+// const AdminOrder = require("../model/adminOrder.model");
+
+// exports.createDraw = async (req, res) => {
+//   try {
+//     // 📅 Today Range (UTC)
+//     const today = new Date();
+//     today.setHours(0, 0, 0, 0);
+
+//     const tomorrow = new Date(today);
+//     tomorrow.setDate(tomorrow.getDate() + 1);
+
+//     console.log("Today:", today);
+//     console.log("Tomorrow:", tomorrow);
+
+//     // ❌ Prevent Duplicate Draw
+//     const already = await Draw.findOne({
+//       drawDate: { $gte: today, $lt: tomorrow },
+//     });
+
+//     if (already) {
+//       return res.status(400).json({ message: "Today's draw already done" });
+//     }
+
+//     // 🔹 Load Today's Real Tickets using $elemMatch
+//     const orders = await Order.find({
+//       tickets: {
+//         $elemMatch: {
+//           status: "active",
+//           drawDate: { $gte: today, $lt: tomorrow },
+//         },
+//       },
+//     });
+
+//     console.log("Total Orders with Today's Tickets:", orders.length);
+
+//     const realTickets = orders.flatMap((o) =>
+//       o.tickets.filter(
+//         (t) =>
+//           t.status === "active" &&
+//           new Date(t.drawDate) >= today &&
+//           new Date(t.drawDate) < tomorrow,
+//       ),
+//     );
+
+//     console.log("Total Real Tickets:", realTickets.length);
+
+//     const totalRealTickets = realTickets.length;
+
+//     // 🔹 Calculate Real Winners
+//     let realWinnerCount = Math.floor(totalRealTickets / 1000) * 10;
+
+//     // 🔹 Cap max 50
+//     if (realWinnerCount > 50) realWinnerCount = 50;
+
+//     const TOTAL_SHOW = 50;
+//     const adminWinnerCount = TOTAL_SHOW - realWinnerCount;
+
+//     // 🎲 Pick Real Winners
+//     const shuffledReal = [...realTickets].sort(() => 0.5 - Math.random());
+//     const realWinners = shuffledReal.slice(0, realWinnerCount);
+//     const realNumbers = realWinners.map((t) => Number(t.ticketNumber));
+
+//     // 🎭 Pick Admin Winners
+//     let adminNumbers = [];
+
+//     if (adminWinnerCount > 0) {
+//       const adminOrders = await AdminOrder.find({
+//         tickets: {
+//           $elemMatch: {
+//             status: "active",
+//           },
+//         },
+//       });
+
+//       const adminTickets = adminOrders.flatMap((o) =>
+//         o.tickets.filter((t) => t.status === "active"),
+//       );
+
+//       console.log("Total Admin Tickets:", adminTickets.length);
+
+//       const shuffledAdmin = [...adminTickets].sort(() => 0.5 - Math.random());
+//       const adminWinners = shuffledAdmin.slice(0, adminWinnerCount);
+//       adminNumbers = adminWinners.map((t) => Number(t.ticketNumber));
+//     }
+
+//     // 🏆 Final 50 Winners
+//     const finalWinners = [...realNumbers, ...adminNumbers];
+
+//     // 💾 Save Draw
+//     const draw = new Draw({
+//       drawDate: new Date(),
+//       winningNumbers: finalWinners,
+//     });
+
+//     await draw.save();
+
+//     // 🔒 Mark Real Winners as Used
+//     for (const win of realWinners) {
+//       await Order.updateOne(
+//         { "tickets.ticketNumber": win.ticketNumber },
+//         { $set: { "tickets.$.status": "used" } },
+//       );
+//     }
+
+//     // 🔒 Mark All Today's Non-Winner Tickets as Expired
+//     await Order.updateMany(
+//       {
+//         tickets: {
+//           $elemMatch: {
+//             status: "active",
+//             drawDate: { $gte: today, $lt: tomorrow },
+//           },
+//         },
+//       },
+//       {
+//         $set: {
+//           "tickets.$[elem].isExpired": true,
+//           "tickets.$[elem].status": "expired",
+//         },
+//       },
+//       {
+//         arrayFilters: [
+//           {
+//             "elem.status": "active",
+//             "elem.drawDate": { $gte: today, $lt: tomorrow },
+//           },
+//         ],
+//       },
+//     );
+
+//     console.log("Final Winners:", finalWinners.length);
+
+//     // 📤 Response
+//     res.json({
+//       date: today,
+//       totalRealTickets,
+//       realWinners: realNumbers.length,
+//       adminWinners: adminNumbers.length,
+//       publishedWinners: finalWinners.length,
+//       winners: finalWinners,
+//     });
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ message: err.message });
+//   }
+// };
+
+// const Draw = require("../model/draw.model");
+// const Order = require("../model/order.model");
+// const AdminOrder = require("../model/adminOrder.model");
+
+// exports.createDraw = async (req, res) => {
+//   try {
+//     // 🕛 Today (UTC 00:00 → 23:59)
+//     const today = new Date();
+//     today.setUTCHours(0, 0, 0, 0);
+
+//     const tomorrow = new Date(today);
+//     tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
+
+//     // ❌ Prevent Duplicate Draw
+//     const already = await Draw.findOne({
+//       drawDate: { $gte: today, $lt: tomorrow },
+//     });
+
+//     if (already) {
+//       return res
+//         .status(400)
+//         .json({ message: "Today's draw already completed" });
+//     }
+
+//     // 🔍 Load today's REAL tickets
+//     const orders = await Order.find({
+//       tickets: {
+//         $elemMatch: {
+//           status: "active",
+//           isExpired: false,
+//           drawDate: { $gte: today, $lt: tomorrow },
+//         },
+//       },
+//     });
+
+//     const realTickets = orders.flatMap((o) =>
+//       o.tickets.filter(
+//         (t) =>
+//           t.status === "active" &&
+//           t.isExpired === false &&
+//           new Date(t.drawDate) >= today &&
+//           new Date(t.drawDate) < tomorrow,
+//       ),
+//     );
+
+//     const totalRealTickets = realTickets.length;
+
+//     // 🧮 Real winners calculation
+//     let realWinnerCount = Math.floor(totalRealTickets / 1000) * 10;
+//     if (realWinnerCount > 50) realWinnerCount = 50;
+
+//     const TOTAL_SHOW = 50;
+//     const adminWinnerCount = TOTAL_SHOW - realWinnerCount;
+
+//     // 🎲 Pick real winners
+//     const shuffledReal = [...realTickets].sort(() => 0.5 - Math.random());
+//     const realWinners = shuffledReal.slice(0, realWinnerCount);
+//     const realNumbers = realWinners.map((t) => Number(t.ticketNumber));
+
+//     // 🎭 Pick admin winners
+//     let adminNumbers = [];
+
+//     if (adminWinnerCount > 0) {
+//       const adminOrders = await AdminOrder.find({
+//         tickets: { $elemMatch: { status: "active", isExpired: false } },
+//       });
+
+//       const adminTickets = adminOrders.flatMap((o) =>
+//         o.tickets.filter((t) => t.status === "active" && t.isExpired === false),
+//       );
+
+//       const shuffledAdmin = [...adminTickets].sort(() => 0.5 - Math.random());
+//       const adminWinners = shuffledAdmin.slice(0, adminWinnerCount);
+//       adminNumbers = adminWinners.map((t) => Number(t.ticketNumber));
+//     }
+
+//     // 🏆 Final 50 winners
+//     const finalWinners = [...realNumbers, ...adminNumbers];
+
+//     // 💾 Save draw
+//     const draw = new Draw({
+//       drawDate: new Date(),
+//       winningNumbers: finalWinners,
+//     });
+
+//     await draw.save();
+
+//     // 🔒 Mark real winners as USED
+//     for (const win of realWinners) {
+//       await Order.updateOne(
+//         { "tickets.ticketNumber": win.ticketNumber },
+//         {
+//           $set: {
+//             "tickets.$.status": "used",
+//             "tickets.$.isExpired": true,
+//           },
+//         },
+//       );
+//     }
+
+//     // ⛔ Expire all remaining today's real tickets
+//     await Order.updateMany(
+//       {
+//         tickets: {
+//           $elemMatch: {
+//             status: "active",
+//             isExpired: false,
+//             drawDate: { $gte: today, $lt: tomorrow },
+//           },
+//         },
+//       },
+//       {
+//         $set: {
+//           "tickets.$[t].status": "expired",
+//           "tickets.$[t].isExpired": true,
+//         },
+//       },
+//       {
+//         arrayFilters: [
+//           {
+//             "t.status": "active",
+//             "t.isExpired": false,
+//             "t.drawDate": { $gte: today, $lt: tomorrow },
+//           },
+//         ],
+//       },
+//     );
+
+//     // 📤 Response
+//     res.json({
+//       date: today,
+//       totalRealTickets,
+//       realWinners: realNumbers.length,
+//       adminWinners: adminNumbers.length,
+//       publishedWinners: finalWinners.length,
+//       winners: finalWinners,
+//     });
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ message: err.message });
+//   }
+// };
+
 const Draw = require("../model/draw.model");
 const Order = require("../model/order.model");
 const AdminOrder = require("../model/adminOrder.model");
 
 exports.createDraw = async (req, res) => {
   try {
-    // 📅 Today Range (UTC)
+    // 🕛 Today UTC Range
     const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    today.setUTCHours(0, 0, 0, 0);
 
     const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
 
-    console.log("Today:", today);
-    console.log("Tomorrow:", tomorrow);
-
-    // ❌ Prevent Duplicate Draw
+    // ❌ Prevent duplicate draw
     const already = await Draw.findOne({
       drawDate: { $gte: today, $lt: tomorrow },
     });
 
     if (already) {
-      return res.status(400).json({ message: "Today's draw already done" });
+      return res
+        .status(400)
+        .json({ message: "Today's draw already completed" });
     }
 
-    // 🔹 Load Today's Real Tickets using $elemMatch
+    // 🔍 Load today's real tickets
     const orders = await Order.find({
       tickets: {
         $elemMatch: {
           status: "active",
+          isExpired: false,
           drawDate: { $gte: today, $lt: tomorrow },
         },
       },
     });
 
-    console.log("Total Orders with Today's Tickets:", orders.length);
-
     const realTickets = orders.flatMap((o) =>
       o.tickets.filter(
         (t) =>
           t.status === "active" &&
+          t.isExpired === false &&
           new Date(t.drawDate) >= today &&
           new Date(t.drawDate) < tomorrow,
       ),
     );
 
-    console.log("Total Real Tickets:", realTickets.length);
-
     const totalRealTickets = realTickets.length;
 
-    // 🔹 Calculate Real Winners
+    // 🧮 Real winners calculation
     let realWinnerCount = Math.floor(totalRealTickets / 1000) * 10;
-
-    // 🔹 Cap max 50
     if (realWinnerCount > 50) realWinnerCount = 50;
 
     const TOTAL_SHOW = 50;
     const adminWinnerCount = TOTAL_SHOW - realWinnerCount;
 
-    // 🎲 Pick Real Winners
+    // 🎲 Pick real winners
     const shuffledReal = [...realTickets].sort(() => 0.5 - Math.random());
     const realWinners = shuffledReal.slice(0, realWinnerCount);
     const realNumbers = realWinners.map((t) => Number(t.ticketNumber));
 
-    // 🎭 Pick Admin Winners
+    // 🎭 Pick admin winners
     let adminNumbers = [];
 
     if (adminWinnerCount > 0) {
       const adminOrders = await AdminOrder.find({
-        tickets: {
-          $elemMatch: {
-            status: "active",
-          },
-        },
+        tickets: { $elemMatch: { status: "active", isExpired: false } },
       });
 
       const adminTickets = adminOrders.flatMap((o) =>
-        o.tickets.filter((t) => t.status === "active"),
+        o.tickets.filter((t) => t.status === "active" && t.isExpired === false),
       );
-
-      console.log("Total Admin Tickets:", adminTickets.length);
 
       const shuffledAdmin = [...adminTickets].sort(() => 0.5 - Math.random());
       const adminWinners = shuffledAdmin.slice(0, adminWinnerCount);
       adminNumbers = adminWinners.map((t) => Number(t.ticketNumber));
     }
 
-    // 🏆 Final 50 Winners
+    // 🏆 Final 50 winners
     const finalWinners = [...realNumbers, ...adminNumbers];
 
-    // 💾 Save Draw
+    // 💾 Save draw
     const draw = new Draw({
       drawDate: new Date(),
       winningNumbers: finalWinners,
     });
-
     await draw.save();
 
-    // 🔒 Mark Real Winners as Used
+    // 🏆 Mark real winners as WON
     for (const win of realWinners) {
       await Order.updateOne(
         { "tickets.ticketNumber": win.ticketNumber },
-        { $set: { "tickets.$.status": "used" } },
+        {
+          $set: {
+            "tickets.$.status": "won",
+            "tickets.$.isExpired": true,
+          },
+        },
       );
     }
 
-    // 🔒 Mark All Today's Non-Winner Tickets as Expired
+    // ⛔ Expire all remaining today's non-winner tickets
     await Order.updateMany(
       {
         tickets: {
           $elemMatch: {
             status: "active",
+            isExpired: false,
             drawDate: { $gte: today, $lt: tomorrow },
           },
         },
       },
       {
         $set: {
-          "tickets.$[elem].isExpired": true,
-          "tickets.$[elem].status": "expired",
+          "tickets.$[t].status": "expired",
+          "tickets.$[t].isExpired": true,
         },
       },
       {
         arrayFilters: [
           {
-            "elem.status": "active",
-            "elem.drawDate": { $gte: today, $lt: tomorrow },
+            "t.status": "active",
+            "t.isExpired": false,
+            "t.drawDate": { $gte: today, $lt: tomorrow },
           },
         ],
       },
     );
-
-    console.log("Final Winners:", finalWinners.length);
 
     // 📤 Response
     res.json({
@@ -146,6 +431,7 @@ exports.createDraw = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
 // Get all draws
 exports.getAllDraws = async (req, res) => {
   try {

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { api } from "../api";
 
 const AllTickets = () => {
   const [tickets, setTickets] = useState([]);
@@ -22,11 +21,11 @@ const AllTickets = () => {
     setLoading(true);
     try {
       // Replace with actual API call
-      const response = await api.get("/orders");
-      const data = response.data;
+      const response = await fetch(`${import.meta.env.VITE_BASE_URL}/orders`);
+      const data = await response.json();
 
       setTickets(data);
-
+      console.log("Fetched tickets:", data);
       // Calculate stats
       const activeTickets = data.filter((t) =>
         t.tickets.some((ticket) => ticket.status === "active"),

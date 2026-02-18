@@ -6,6 +6,7 @@ const Results = () => {
   const [checking, setChecking] = useState(false);
   const [result, setResult] = useState(null);
   const [drawResults, setDrawResults] = useState([]);
+  const [checkedResults, setCheckedResults] = useState(null);
   const [filter, setFilter] = useState("all"); // all, today, week, month
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -13,7 +14,7 @@ const Results = () => {
   useEffect(() => {
     fetchDrawResults();
   }, [filter]);
-  console.log("Draw Results:", drawResults);
+
   const fetchDrawResults = async () => {
     setLoading(true);
     try {
@@ -43,25 +44,12 @@ const Results = () => {
     setResult(null);
 
     try {
-      // Simulated API call - replace with actual API
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      // Check if mobile number exists in winners (simulated)
-      const found = drawResults.find((item) => item.mobile === mobileNumber);
-
-      if (found) {
-        setResult({
-          status: "won",
-          message: "🎉 অভিনন্দন! আপনি বিজয়ী হয়েছেন!",
-          details: found,
-        });
-      } else {
-        setResult({
-          status: "lost",
-          message: "😔 দুঃখিত, আপনি এই ড্রতে বিজয়ী হননি",
-          details: null,
-        });
-      }
+      const response = await fetch(
+        `${import.meta.env.VITE_BASE_URL}/orders/check?mobile=${mobileNumber}`,
+      );
+      if (!response.ok) throw new Error("Failed to check result");
+      const data = await response.json();
+      setCheckedResults(data);
     } catch (error) {
       setResult({
         status: "error",
@@ -111,7 +99,7 @@ const Results = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 py-8 px-4 sm:px-6 lg:px-8 font-kalpurush">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
@@ -171,44 +159,47 @@ const Results = () => {
             </div>
 
             {/* Result Display */}
-            {result && (
+            {checkedResults?.map((order, index) => (
               <div
-                className={`mt-6 p-6 rounded-xl animate-slideIn ${
-                  result.status === "won"
-                    ? "bg-gradient-to-r from-green-500 to-green-600 text-white"
-                    : result.status === "lost"
-                      ? "bg-gradient-to-r from-red-500 to-red-600 text-white"
-                      : "bg-gradient-to-r from-yellow-500 to-yellow-600 text-white"
-                }`}
+                key={index}
+                className="mt-4 bg-purple-100 text-green-800 px-6 py-4 rounded-lg text-center"
               >
-                <div className="flex items-center gap-4">
-                  <span className="text-4xl">
-                    {result.status === "won"
-                      ? "🎉"
-                      : result.status === "lost"
-                        ? "😔"
-                        : "⚠️"}
-                  </span>
-                  <div>
-                    <p className="text-xl font-bold mb-2">{result.message}</p>
-                    {result.details && (
-                      <div className="bg-white bg-opacity-20 rounded-lg p-4 mt-3">
-                        <p className="flex items-center gap-2">
-                          <span>📅</span> তারিখ:{" "}
-                          {formatDate(result.details.date)}
-                        </p>
-                        <p className="flex items-center gap-2">
-                          <span>🎫</span> টিকেট নম্বর: {result.details.ticket}
-                        </p>
-                        <p className="flex items-center gap-2">
-                          <span>🏆</span> পুরস্কার: {result.details.prize}
-                        </p>
-                      </div>
-                    )}
+                <h3 className="text-2xl font-bold mb-2">নামঃ {order?.name}</h3>
+                <h3 className=" font-bold mb-2 text-xl">
+                  মোবাইল নাম্বার: {order?.phone}
+                </h3>
+
+                {order?.tickets?.length > 0 ? (
+                  <div className="mt-4">
+                    <p className="text-lg font-semibold mb-2">
+                      আপনার টিকেট নম্বর:
+                    </p>
+                    <ul className="list-disc list-inside text-left">
+                      {order?.tickets?.map((ticket, index) => (
+                        <li key={index} className="text-lg">
+                          <span
+                            className={`${ticket.status === "won" ? "text-green-600" : "text-red-600"}`}
+                          >
+                            {ticket.ticketNumber} -{" "}
+                          </span>
+                          {ticket.status === "won" ? (
+                            <span className="text-green-600 font-bold">
+                              জিতেছেন
+                            </span>
+                          ) : (
+                            <span className="text-red-600 font-bold">
+                              জিতেননি
+                            </span>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                </div>
+                ) : (
+                  <p className="text-lg mt-4">আপনার কোনো টিকেট নেই।</p>
+                )}
               </div>
-            )}
+            ))}
           </div>
         </div>
 
@@ -273,17 +264,17 @@ const Results = () => {
               {/* Desktop Table */}
               <div className="hidden md:block overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-gray-50">
+                  <thead className="bg-gray-50 text-center">
                     <tr>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
+                      <th className="px-6 py-4  text-sm font-semibold text-gray-600 text-center">
                         তারিখ
                       </th>
 
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
+                      <th className="px-6 py-4 text-center text-sm font-semibold text-gray-600">
                         টিকেট নম্বর সমুহ
                       </th>
 
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-600">
+                      <th className="px-6 py-4 text-center text-sm font-semibold text-gray-600">
                         পুরস্কার
                       </th>
                     </tr>
@@ -299,11 +290,11 @@ const Results = () => {
                             {formatDate(item.drawDate)}
                           </td>
                           <td className="px-6 py-4 text-sm text-gray-600 font-mono">
-                            <span className="">
+                            <span className="grid grid-cols-2 md:grid-cols-4 gap-2">
                               {item.winningNumbers?.map((num, index) => (
                                 <span
                                   key={index}
-                                  className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full mx-1 text-xs font-semibold"
+                                  className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full mx-1 text-xs font-semibold text-center"
                                 >
                                   {num}
                                 </span>
@@ -352,7 +343,7 @@ const Results = () => {
                         </div>
                       </div>
                       <div className="grid grid-cols-2 gap-2 text-sm">
-                        <div ফclassName="col-span-2 flex flex-col space-y-2">
+                        <div className="col-span-2 flex flex-col space-y-2">
                           <p className="text-gray-500">টিকেট নাম্বার সমুহ</p>
                           <p className="font-mono font-semibold text-blue-600">
                             <span className="inline-flex flex-wrap gap-1 mt-1">

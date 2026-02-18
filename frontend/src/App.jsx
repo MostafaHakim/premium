@@ -6,6 +6,7 @@ import Layout from "./layouts/Layout";
 import Trams from "./pages/Trams";
 import Results from "./pages/Results";
 import ComingSoon from "./pages/ComingSoon";
+import AllTickets from "./pages/AllTickets";
 
 export default function App() {
   return (
@@ -53,10 +54,18 @@ export default function App() {
           }
         />
         <Route
-          path="/premiumdrawmosquito"
+          path="/admin/premiumdrawmosquito"
           element={
             <Layout>
               <AdminDraw />
+            </Layout>
+          }
+        />
+        <Route
+          path="/admin/alltickets"
+          element={
+            <Layout>
+              <AllTickets />
             </Layout>
           }
         />

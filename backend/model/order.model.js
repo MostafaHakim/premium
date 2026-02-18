@@ -21,7 +21,7 @@ const tickeetSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ["active", "expired", "cancelled", "used"],
+    enum: ["active", "cancelled", "used", "won"],
     required: true,
   },
 });

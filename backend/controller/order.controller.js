@@ -100,6 +100,18 @@ exports.getAllOrders = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+exports.checkOrder = async (req, res) => {
+  try {
+    const { mobile } = req.query;
+    const order = await Order.find({ phone: mobile });
+    if (!order || order.length === 0) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+    res.status(200).json(order);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
 // Get a single order by ID
 exports.getOrderById = async (req, res) => {
