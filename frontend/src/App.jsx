@@ -45,6 +45,14 @@ export default function App() {
           }
         />
         <Route
+          path="/results"
+          element={
+            <Layout>
+              <Results />
+            </Layout>
+          }
+        />
+        <Route
           path="/premiumdrawmosquito"
           element={
             <Layout>

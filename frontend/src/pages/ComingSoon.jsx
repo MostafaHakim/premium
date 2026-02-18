@@ -13,7 +13,7 @@ const ComingSoon = () => {
   // Set launch date (7 days from now)
   useEffect(() => {
     const launchDate = new Date();
-    launchDate.setDate(launchDate.getDate() + 2);
+    launchDate.setDate(launchDate.getDate() + 1);
     launchDate.setHours(10, 0, 0, 0); // Launch at 10:00 AM
 
     const timer = setInterval(() => {
