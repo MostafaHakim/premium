@@ -181,12 +181,16 @@ const Results = () => {
                           className="text-lg flex flex-col items-center justify-center"
                         >
                           <span
-                            className={`${ticket.status === "won" ? "text-green-600" : ticket.status === "cancelled" ? "text-red-600" : "text-gray-600"} text-4xl font-bold`}
+                            className={`${ticket.status === "active" ? "text-yellow-600" : ticket.status === "won" ? "text-green-600" : ticket.status === "cancelled" ? "text-red-600" : "text-gray-600"} text-4xl font-bold`}
                           >
                             {ticket.ticketNumber}{" "}
                           </span>{" "}
                           <br />
-                          {ticket.status === "won" ? (
+                          {ticket.status === "active" ? (
+                            <span className="text-yellow-600 font-bold">
+                              ⚠️ এখনো ড্র অনুষ্ঠিত হয় নি ⚠️
+                            </span>
+                          ) : ticket.status === "won" ? (
                             <span className="text-green-600 font-bold">
                               🏆 অভিনন্দন আপনি জিতেছেন একটি প্রিমিয়াম মশারী 🏆
                             </span>
