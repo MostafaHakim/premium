@@ -174,21 +174,30 @@ const Results = () => {
                     <p className="text-lg font-semibold mb-2">
                       আপনার টিকেট নম্বর:
                     </p>
-                    <ul className="list-disc list-inside text-left">
+                    <ul className="list-none list-inside">
                       {order?.tickets?.map((ticket, index) => (
-                        <li key={index} className="text-lg">
+                        <li
+                          key={index}
+                          className="text-lg flex flex-col items-center justify-center"
+                        >
                           <span
-                            className={`${ticket.status === "won" ? "text-green-600" : "text-red-600"}`}
+                            className={`${ticket.status === "won" ? "text-green-600" : ticket.status === "cancelled" ? "text-red-600" : "text-gray-600"} text-4xl font-bold`}
                           >
-                            {ticket.ticketNumber} -{" "}
-                          </span>
+                            {ticket.ticketNumber}{" "}
+                          </span>{" "}
+                          <br />
                           {ticket.status === "won" ? (
                             <span className="text-green-600 font-bold">
-                              জিতেছেন
+                              🏆 অভিনন্দন আপনি জিতেছেন একটি প্রিমিয়াম মশারী 🏆
+                            </span>
+                          ) : ticket.status === "cancelled" ? (
+                            <span className="text-red-600 font-bold">
+                              ❌আপানার টিকেট টি বাতিল করা হয়েছে আপনি ভুল
+                              ট্রান্সেকশন আইডি দিয়েছেন❌
                             </span>
                           ) : (
-                            <span className="text-red-600 font-bold">
-                              জিতেননি
+                            <span className="text-gray-600 font-bold">
+                              ⚠️এই টিকেট টি পুরুষ্কারের জন্য নির্বাচিত হয়নি⚠️
                             </span>
                           )}
                         </li>
